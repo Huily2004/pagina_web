@@ -11,10 +11,11 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
   </head>
   <body>
-    <h1>pagina principal </h1>
-    <a href="{{ url_for('login.login') }}" class="btn btn-secondary">ver pacientes</a>
+    <h1>Clinica </h1>
+    <a href="{{ url_for('login.login') }}" class="btn btn-secondary">login </a>
 
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
