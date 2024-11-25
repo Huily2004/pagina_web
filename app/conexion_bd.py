@@ -3,8 +3,8 @@ import mysql.connector
 
 def obtener_conexion():
     return mysql.connector.connect(
-        host="127.0.0.1",
-        user="root",
-        password="root",
-        database="proyecto_final",
+        host="blh32mgloalgepud7kjj-mysql.services.clever-cloud.com",
+        user="uyot2szbhatqnnas",
+        password="GnBU3C59U93SE7G5F844",
+        database="blh32mgloalgepud7kjj",
     )
