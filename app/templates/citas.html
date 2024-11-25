@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Citas</title>
+    <!-- Agregar el enlace a Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Listado de Citas</h1>
+
+        <!-- Botón para abrir el Modal de Nueva Cita -->
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevaCitaModal">Nueva Cita</button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="GET" action="{{ url_for('citas.listar_citas') }}" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activo</option>
+                        <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Tabla de Citas -->
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>ID cita</th>
+                    <th>ID paciente</th>
+                    <th>ID medico</th>
+                    <th>Fecha y horario</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cita in citas %}
+                <tr>
+                    <td>{{ cita.id_cita }}</td>
+                    <td>{{ cita.nombre_paciente }} {{ cita.apellido_paciente }}</td>
+                    <td>{{ cita.nombre_medico }} {{ cita.apellido_medico }}</td>
+                    <td>{{ cita.fecha_hora }}</td>
+                    <td>{{ cita.motivo }}</td>
+                    <td>{{ cita.estado }}</td>
+                    <td>
+                        <!-- Botón de Editar -->
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editarCitaModal"
+                        data-id_cita1="{{ cita.id_cita }}"
+                        data-id_paciente1="{{ cita.id_paciente }}"
+                        data-id_medico1="{{ cita.id_medico }}"
+                        data-fecha_hora1="{{ cita.fecha_hora }}"
+                        data-motivo1="{{ cita.motivo }}"
+                        data-estado1="{{ cita.estado }}">
+                        Editar
+                    </button>
+                    <form method="POST" action="{{ url_for('citas.cambiar_estado') }}" style="display: inline;">
+                        <input type="hidden" name="id_cita1" value="{{ cita.id_cita}}">
+                        <input type="hidden" name="estado" value="{{ 'inactivo' if cita.estado == 'activo' else 'activo' }}">
+                        <button type="submit" class="btn btn-secondary">
+                            {{ 'Desactivar' if cita.estado == 'activo' else 'Activar' }}
+                        </button>
+                    </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modal para Nueva Cita -->
+        <div class="modal fade" id="nuevaCitaModal" tabindex="-1" aria-labelledby="nuevaCitaModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="nuevaCitaModalLabel">Crear Nueva Cita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{{ url_for('citas.crear_cita') }}">
+                            <div class="mb-3">
+                                <label for="id_paciente" class="form-label">ID Paciente</label>
+                                <input type="text" class="form-control" id="id_paciente" name="id_paciente" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_medico" class="form-label">ID Médico</label>
+                                <input type="text" class="form-control" id="id_medico" name="id_medico" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fecha_hora" class="form-label">Fecha y Hora</label>
+                                <input type="datetime-local" class="form-control" id="fecha_hora" name="fecha_hora" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="motivo" class="form-label">Motivo</label>
+                                <textarea class="form-control" id="motivo" name="motivo" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="estado" class="form-label">Estado</label>
+                                <select class="form-select" id="estado" name="estado" required>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar Cita</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editarCitaModal" tabindex="-1" aria-labelledby="editarCitaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarCitaModalLabel">Editar Cita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Formulario de Edición -->
+                    <form method="POST" action="{{ url_for('citas.editar_cita') }}">
+                        <input type="hidden" id="id_cita1" name="id_cita1">
+
+                        <div class="mb-3">
+                            <label for="id_paciente1" class="form-label">ID Paciente</label>
+                            <input type="text" class="form-control" id="id_paciente1" name="id_paciente1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_medico1" class="form-label">ID Médico</label>
+                            <input type="text" class="form-control" id="id_medico1" name="id_medico1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fecha_hora1" class="form-label">Fecha y Hora</label>
+                            <input type="datetime-local" class="form-control" id="fecha_hora1" name="fecha_hora1" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="motivo1" class="form-label">Motivo</label>
+                            <textarea class="form-control" id="motivo1" name="motivo1" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="estado1" class="form-label">Estado</label>
+                            <select class="form-select" id="estado1" name="estado1" required>
+                                <option value="activo">Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Actualizar Cita</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   <!-- Agregar este script justo antes de </body> -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editarCitaModal = document.getElementById('editarCitaModal');
+    
+        if (!editarCitaModal.dataset.listenerAdded) {
+            editarCitaModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Botón que disparó el modal
+    
+                // Obtén los datos del botón
+                var idCita = button.getAttribute('data-id_cita1');
+                var idPaciente = button.getAttribute('data-id_paciente1');
+                var idMedico = button.getAttribute('data-id_medico1');
+                var fechaHora = button.getAttribute('data-fecha_hora1');
+                var motivo = button.getAttribute('data-motivo1');
+                var estado = button.getAttribute('data-estado1');
+    
+                // Debug: Verificar datos en consola
+                console.log("ID Cita:", idCita);
+                console.log("ID Paciente:", idPaciente);
+                console.log("ID Medico:", idMedico);
+                console.log("Fecha y Hora:", fechaHora);
+                console.log("Motivo:", motivo);
+                console.log("Estado:", estado);
+    
+                // Asigna los datos a los campos del modal
+                document.getElementById('id_cita1').value = idCita;
+                document.getElementById('id_paciente1').value = idPaciente;
+                document.getElementById('id_medico1').value = idMedico;
+                document.getElementById('fecha_hora1').value = fechaHora;
+                document.getElementById('motivo1').value = motivo;
+                document.getElementById('estado1').value = estado;
+            });
+    
+            // Marca que el listener ya fue añadido
+            editarCitaModal.dataset.listenerAdded = true;
+        }
+    });
+    
+</script>
+
+    {% endblock %}
+    
+</body>
+</html>

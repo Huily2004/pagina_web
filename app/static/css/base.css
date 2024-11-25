@@ -1,0 +1,17 @@
+body{
+    background-image: url(../imagenes/medico.png);
+}
+.table {
+    background-color: #ffffff; /* Fondo blanco sólido */
+}
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f8f9fa; /* Color de fondo alternado sólido */
+}
+.table-bordered {
+    border: 1px solid #dee2e6; /* Borde sólido */
+}
+.table-light {
+    background-color: #e9ecef; /* Fondo claro para el encabezado */
+    color: #000; /* Texto oscuro */
+}
+

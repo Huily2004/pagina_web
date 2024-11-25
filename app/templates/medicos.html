@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Medicos</title>
+    <!-- Agregar el enlace a Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    {% extends "base.html" %}
+    {% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Listado de Medicos</h1>
+
+        <!-- Botón para abrir el Modal de Nuevo Paciente -->
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoMedicoModal">Nuevo Médico</button>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="GET" action="{{ url_for('medicos.listar_medicos') }}" class="mb-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <select name="estado" class="form-select">
+                        <option value="">Todos los estados</option>
+                        <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activo</option>
+                        <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivo</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Tabla de Pacientes -->
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>apellido</th>
+                    <th>especialidad</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>estado</th>
+                    <th>Acciones</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for medico in medicos %}
+                <tr>
+                    <td>{{ medico.id_medico }}</td>
+                    <td>{{ medico.nombre }}</td>
+                    <td>{{ medico.apellido }}</td>
+                    <td>{{ medico.especialidad}}</td>
+                    <td>{{ medico.telefono }}</td>
+                    <td>{{ medico.email }}</td>
+                    <td>{{ medico.estado }}</td>
+                    
+                    <td>
+                        <!-- Botón de Editar -->
+                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editarMedicosModal"
+                                data-id="{{ medico.id_medico }}"
+                                data-nombre="{{ medico.nombre }}"
+                                data-apellido="{{ medico.apellido }}"
+                                data-especialidad="{{ medico.especialidad }}"
+                                data-telefono="{{ medico.telefono }}"
+                                data-email="{{ medico.email }}"
+                                data-estado="{{ medico.estado }}">
+                            Editar
+                        </button>
+
+                        <form method="POST" action="{{ url_for('medicos.cambiar_estado') }}" style="display: inline;">
+                            <input type="hidden" name="id_medico" value="{{ medico.id_medico }}">
+                            <input type="hidden" name="estado" value="{{ 'inactivo' if medico.estado == 'activo' else 'activo' }}">
+                            <button type="submit" class="btn btn-secondary">
+                                {{ 'Desactivar' if medico.estado == 'activo' else 'Activar' }}
+                            </button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="nuevoMedicoModal" tabindex="-1" aria-labelledby="nuevoMedicoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoMedicoModalLabel">Agregar Nuevo Médico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{{ url_for('medicos.nuevo_medico') }}">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" maxlength="30"
+                            minlength="2" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                            title="El nombre solo puede contener letras y espacios, y debe tener como máximo 30 caracteres." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido" maxlength="30"
+                            minlength="2" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                            title="El apellido solo puede contener letras y espacios, y debe tener como máximo 30 caracteres." required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="especialidad" class="form-label">Especialidad</label>
+                            <input type="text" class="form-control" id="especialidad" name="especialidad" maxlength="30" minlength="4"  required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" required
+                                   pattern="^\+?[0-9\s\-\(\)]{7,15}$" 
+                                   title="Ingresa un número de teléfono válido. Ejemplo: +123456789 o (123) 456-7890">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-select" id="estado" name="estado" required>
+                                <option value="activo" selected>Activo</option>
+                                <option value="inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal para editar médico -->
+<div class="modal fade" id="editarMedicosModal" tabindex="-1" aria-labelledby="editarMedicosModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editarMedicosModalLabel">Editar Médico</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('medicos.editar_medico') }}">
+                <div class="modal-body">
+                    <input type="hidden" id="id_medico" name="id_medico">
+                    <div class="mb-3">
+                        <label for="editar_nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editar_nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editar_apellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="editar_apellido" name="apellido" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editar_especialidad" class="form-label">Especialidad</label>
+                        <input type="text" class="form-control" id="editar_especialidad" name="especialidad" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editar_telefono" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="editar_telefono" name="telefono" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editar_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editar_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editar_estado" class="form-label">Estado</label>
+                        <select class="form-select" id="editar_estado" name="estado" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const editarModal = document.getElementById('editarMedicosModal');
+    editarModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const nombre = button.getAttribute('data-nombre');
+        const apellido = button.getAttribute('data-apellido');
+        const especialidad = button.getAttribute('data-especialidad');
+        const telefono = button.getAttribute('data-telefono');
+        const email = button.getAttribute('data-email');
+        const estado = button.getAttribute('data-estado');
+
+        // Asignar valores al formulario del modal
+        document.getElementById('id_medico').value = id;
+        document.getElementById('editar_nombre').value = nombre;
+        document.getElementById('editar_apellido').value = apellido;
+        document.getElementById('editar_especialidad').value = especialidad;
+        document.getElementById('editar_telefono').value = telefono;
+        document.getElementById('editar_email').value = email;
+        document.getElementById('editar_estado').value = estado;
+    });
+</script>
+
+    {% endblock content %}
+</body>
+</html>
