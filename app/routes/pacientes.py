@@ -19,6 +19,7 @@ from flask import (
 #abort: Termina la solicitud con un código de error HTTP.
 
 from ..conexion_bd  import obtener_conexion
+from .main import role_required
 
 pacientes_bp = Blueprint("pacientes", __name__)
 
