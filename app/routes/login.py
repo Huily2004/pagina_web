@@ -43,7 +43,9 @@ def login():
                 
                 if usuario:
                     # Credenciales válidas
-                    session["usuario"] = usuario["nombre_usuario"]  # Guardar el usuario en la sesión
+                    session["usuario"] = usuario["nombre_usuario"] 
+                    session["rol"] = usuario["rol"]  
+                   # Guardar el usuario en la sesión
                     return redirect(url_for("pacientes.ver_pacientes"))
                 else:
                     flash("Usuario o contraseña incorrectos.", "error")

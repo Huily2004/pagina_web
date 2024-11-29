@@ -18,11 +18,14 @@ from flask import (
 #url_for: Genera rutas dinámicamente.
 #abort: Termina la solicitud con un código de error HTTP.
 
-from ..conexion_bd  import obtener_conexion
+from ..conexion_bd  import obtener_conexion 
+from .main import role_required
 
 citas_bp = Blueprint("citas", __name__)
 
 @citas_bp.route("/citas", methods=["GET", "POST"])
+
+@role_required("admin")
 def ver_citas():
     try:
         # Conexión a la base de datos
@@ -41,15 +44,18 @@ def ver_citas():
                    citas.fecha_hora ,
                    citas.motivo ,
                    citas.estado
+                   
+            
         
             FROM citas
             JOIN pacientes ON citas.id_paciente = pacientes.id_paciente
-            JOIN medicos ON citas.id_medico = medicos.id_medico
+            JOIN medicos ON citas.id_medico = medicos.id_medico 
         """
-        cursor.execute(consulta)
-        citas = cursor.fetchall()
+        #une la tabla de citas con la tabla de pacientes, alineando cada cita con su respectivo paciente.
+        cursor.execute(consulta) #realiza la consulta 
+        citas = cursor.fetchall() #obtienen todos los resultados y se almacenan en la variable
 
-        # Renderizar la plantilla con los pacientes
+        # Renderizar la plantilla con los pacientes , Envía la lista de citas a la plantilla citas.html.
         return render_template("citas.html", citas = citas)
 
     except Exception as e:
@@ -60,6 +66,10 @@ def ver_citas():
             cursor.close()
             conexion.close()
             
+from datetime import datetime, timedelta
+
+from datetime import datetime, timedelta
+
 @citas_bp.route("/citas/crear", methods=["POST"])
 def crear_cita():
     try:
@@ -74,16 +84,36 @@ def crear_cita():
             flash("Todos los campos son obligatorios.", "danger")
             return redirect(url_for("citas.ver_citas"))
 
+        # Convertir la fecha y hora al formato esperado
+        try:
+            fecha_hora_obj = datetime.strptime(fecha_hora, "%Y-%m-%dT%H:%M")
+        except ValueError:
+            flash("El formato de fecha y hora es inválido.", "danger")
+            return redirect(url_for("citas.ver_citas"))
+
         # Conexión a la base de datos
         conexion = obtener_conexion()
         cursor = conexion.cursor()
+
+        # Verificar citas existentes para el mismo médico
+        consulta_verificacion = """
+            SELECT fecha_hora
+            FROM citas
+            WHERE id_medico = %s AND ABS(TIMESTAMPDIFF(MINUTE, fecha_hora, %s)) < 15
+        """
+        cursor.execute(consulta_verificacion, (id_medico, fecha_hora_obj))
+        citas_cercanas = cursor.fetchall()
+
+        if citas_cercanas:
+            flash("No se puede crear la cita: ya existe otra cita cercana para este médico.", "danger")
+            return redirect(url_for("citas.ver_citas"))
 
         # Insertar la cita en la base de datos
         consulta = """
             INSERT INTO citas (id_paciente, id_medico, fecha_hora, motivo, estado)
             VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(consulta, (id_paciente, id_medico, fecha_hora, motivo, estado))
+        cursor.execute(consulta, (id_paciente, id_medico, fecha_hora_obj, motivo, estado))
         conexion.commit()
 
         flash("Cita creada exitosamente.", "success")
@@ -98,7 +128,7 @@ def crear_cita():
         if 'conexion' in locals() and conexion.is_connected():
             cursor.close()
             conexion.close()
-        
+
 @citas_bp.route("/citas/editar", methods=["POST"])
 def editar_cita():
     try:
@@ -109,7 +139,7 @@ def editar_cita():
         motivo = request.form["motivo1"]
         estado = request.form["estado1"]
 
-        # Validar los campos
+        # Valida que todos los campos tengan un valor y si hay errores, envía un mensaje y redirige al listado de citas.
         if not id_paciente or not id_medico or not fecha_hora or not motivo or not estado:
             flash("Todos los campos son obligatorios.", "danger")
             return redirect(url_for('citas.ver_citas'))

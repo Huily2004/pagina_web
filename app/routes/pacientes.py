@@ -24,6 +24,7 @@ pacientes_bp = Blueprint("pacientes", __name__)
 
 
 @pacientes_bp.route("/pacientes", methods=["GET", "POST"])
+@role_required("admin")
 def ver_pacientes():
     try:
         # Conexión a la base de datos

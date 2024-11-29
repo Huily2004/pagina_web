@@ -165,19 +165,26 @@
                     <input type="hidden" id="id_medico" name="id_medico">
                     <div class="mb-3">
                         <label for="editar_nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="editar_nombre" name="nombre" required>
+                        <input type="text" class="form-control" id="editar_nombre" name="nombre" maxlength="30"
+                        minlength="2" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                        title="El nombre solo puede contener letras y espacios, y debe tener como máximo 30 caracteres." required>
                     </div>
                     <div class="mb-3">
                         <label for="editar_apellido" class="form-label">Apellido</label>
-                        <input type="text" class="form-control" id="editar_apellido" name="apellido" required>
+                        <input type="text" class="form-control" id="editar_apellido" name="apellido"  maxlength="30"
+                        minlength="2" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                        title="El apellido solo puede contener letras y espacios, y debe tener como máximo 30 caracteres." required>
                     </div>
                     <div class="mb-3">
                         <label for="editar_especialidad" class="form-label">Especialidad</label>
-                        <input type="text" class="form-control" id="editar_especialidad" name="especialidad" required>
+                        <input type="text" class="form-control" id="editar_especialidad" name="especialidad" maxlength="30"
+                        minlength="2" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                        title="El especialidad solo puede contener letras y espacios, y debe tener como máximo 30 caracteres."  required>
                     </div>
                     <div class="mb-3">
                         <label for="editar_telefono" class="form-label">Teléfono</label>
-                        <input type="tel" class="form-control" id="editar_telefono" name="telefono" required>
+                        <input type="tel" class="form-control" id="editar_telefono" name="telefono"  minlength="7" maxlength="12" pattern="^\d{7,9}$"
+                        title="El telefono debe contener entre 7 y 12 dígitos numéricos" required>
                     </div>
                     <div class="mb-3">
                         <label for="editar_email" class="form-label">Email</label>

@@ -105,19 +105,25 @@
                         <form method="POST" action="{{ url_for('citas.crear_cita') }}">
                             <div class="mb-3">
                                 <label for="id_paciente" class="form-label">ID Paciente</label>
-                                <input type="text" class="form-control" id="id_paciente" name="id_paciente" required>
+                                <input type="text" class="form-control" id="id_paciente" name="id_paciente"  maxlength="9" pattern="^\d{1,9}$"
+                                title="El id debe contener entre 7 y 12 dígitos numéricos" required>
                             </div>
                             <div class="mb-3">
                                 <label for="id_medico" class="form-label">ID Médico</label>
-                                <input type="text" class="form-control" id="id_medico" name="id_medico" required>
+                                <input type="text" class="form-control" id="id_medico" name="id_medico"   maxlength="9" pattern="^\d{1,9}$"
+                                title="El id debe contener entre 7 y 12 dígitos numéricos" required>
                             </div>
                             <div class="mb-3">
                                 <label for="fecha_hora" class="form-label">Fecha y Hora</label>
-                                <input type="datetime-local" class="form-control" id="fecha_hora" name="fecha_hora" required>
+                                <input type="datetime-local" class="form-control" id="fecha_hora" name="fecha_hora" 
+                                       min="2024-11-30T00:00" max="2025-12-31T23:59" step="900" required>
                             </div>
+                            
                             <div class="mb-3">
                                 <label for="motivo" class="form-label">Motivo</label>
-                                <textarea class="form-control" id="motivo" name="motivo" required></textarea>
+                                <textarea class="form-control" id="motivo" name="motivo" maxlength="100"
+                                minlength="5" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                                title="El motivo solo puede contener letras y espacios, y debe tener como máximo 30 caracteres." required></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="estado" class="form-label">Estado</label>
@@ -147,22 +153,27 @@
 
                         <div class="mb-3">
                             <label for="id_paciente1" class="form-label">ID Paciente</label>
-                            <input type="text" class="form-control" id="id_paciente1" name="id_paciente1" required>
+                            <input type="text" class="form-control" id="id_paciente1" name="id_paciente1" minlength="1" maxlength="9" pattern="^\d{1,9}$"
+                            title="El id debe contener entre 7 y 12 dígitos numéricos" required>
                         </div>
-
+                    
                         <div class="mb-3">
                             <label for="id_medico1" class="form-label">ID Médico</label>
-                            <input type="text" class="form-control" id="id_medico1" name="id_medico1" required>
+                            <input type="text" class="form-control" id="id_medico1" name="id_medico1" minlength="1" maxlength="9" pattern="^\d{1,9}$"
+                            title="El id debe contener entre 7 y 12 dígitos numéricos" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="fecha_hora1" class="form-label">Fecha y Hora</label>
-                            <input type="datetime-local" class="form-control" id="fecha_hora1" name="fecha_hora1" required>
+                            <input type="datetime-local" class="form-control" id="fecha_hora1" name="fecha_hora1" 
+                                   min="2024-11-30T00:00" max="2025-12-31T23:59" step="900" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="motivo1" class="form-label">Motivo</label>
-                            <textarea class="form-control" id="motivo1" name="motivo1" required></textarea>
+                            <textarea class="form-control" id="motivo1" name="motivo1" maxlength="100"
+                            minlength="5" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$"
+                            title="El motivo solo puede contener letras y espacios, y debe tener como máximo 30 caracteres." required></textarea>
                         </div>
 
                         <div class="mb-3">
@@ -196,6 +207,9 @@
                 var fechaHora = button.getAttribute('data-fecha_hora1');
                 var motivo = button.getAttribute('data-motivo1');
                 var estado = button.getAttribute('data-estado1');
+              
+
+    
     
                 // Debug: Verificar datos en consola
                 console.log("ID Cita:", idCita);
@@ -204,7 +218,7 @@
                 console.log("Fecha y Hora:", fechaHora);
                 console.log("Motivo:", motivo);
                 console.log("Estado:", estado);
-    
+              
                 // Asigna los datos a los campos del modal
                 document.getElementById('id_cita1').value = idCita;
                 document.getElementById('id_paciente1').value = idPaciente;
@@ -212,6 +226,8 @@
                 document.getElementById('fecha_hora1').value = fechaHora;
                 document.getElementById('motivo1').value = motivo;
                 document.getElementById('estado1').value = estado;
+               
+
             });
     
             // Marca que el listener ya fue añadido

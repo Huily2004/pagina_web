@@ -11,7 +11,19 @@ body{
     border: 1px solid #dee2e6; /* Borde sólido */
 }
 .table-light {
-    background-color: #e9ecef; /* Fondo claro para el encabezado */
+    background-color: #e9efe9; /* Fondo claro para el encabezado */
     color: #000; /* Texto oscuro */
 }
 
+h1 { 
+    text-align: center;
+    margin-top: 100px;
+    background-color: #000;
+    color: white;
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 15px;
+
+
+}

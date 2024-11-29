@@ -23,6 +23,7 @@ from ..conexion_bd  import obtener_conexion
 medicos_bp = Blueprint("medicos", __name__)
 
 @medicos_bp.route("/medicos", methods=["GET", "POST"])
+@role_required("admin")
 def ver_medicos():
     try:
         # Conexión a la base de datos
